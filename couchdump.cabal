@@ -10,8 +10,9 @@ cabal-version:       >=1.10
 
 executable couchdump
   main-is:             Main.hs
-  build-depends:       base >=4.7 && <4.8
+  build-depends:       base >=4.6 && <4.8
                      , bytestring >=0.10.4.0
                      , aeson >=0.9.0.1
+                     , unordered-containers >=0.2.5.1
   hs-source-dirs:      src
   default-language:    Haskell2010

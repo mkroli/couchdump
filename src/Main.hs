@@ -20,6 +20,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Aeson
 import GHC.Generics
 import Control.Applicative
+import Data.HashMap.Strict
 
 data Row = Row {doc :: Object}
   deriving (Show,Generic)
@@ -37,7 +38,7 @@ instance FromJSON ImportDocument
 instance ToJSON ImportDocument
 
 exportToImport :: ExportDocument -> ImportDocument
-exportToImport (ExportDocument rows) = ImportDocument $ fmap doc rows
+exportToImport (ExportDocument rows) = ImportDocument $ fmap (delete "_rev" . doc) rows
 
 putStrLnMaybe :: Maybe B.ByteString -> IO ()
 putStrLnMaybe (Just a) = B.putStrLn a
