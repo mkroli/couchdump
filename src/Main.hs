@@ -14,41 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -}
 
-{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
+import           CouchDump.Args
+import           CouchDump.Convert
+import           CouchDump.CouchDbClient
+import qualified Data.ByteString.Lazy.Char8 as LB
+import           Data.Maybe
+import           Network.HTTP.Conduit
 
-import qualified Data.ByteString.Lazy.Char8 as B
-import Data.Aeson
-import GHC.Generics
-import Control.Applicative
-import Data.HashMap.Strict
+isUrl :: String -> Bool
+isUrl = isJust . parseUrl
 
-data Row = Row {doc :: Object}
-  deriving (Show,Generic)
-instance FromJSON Row
-instance ToJSON Row
+fetchContents :: String -> IO LB.ByteString
+fetchContents "-" = LB.getContents
+fetchContents loc
+  | isUrl loc = fetchDatabase loc
+  | otherwise = LB.readFile loc
 
-data ExportDocument = ExportDocument {rows :: [Row]}
-  deriving (Show,Generic)
-instance FromJSON ExportDocument
-instance ToJSON ExportDocument
-
-data ImportDocument = ImportDocument {docs :: [Object]}
-  deriving (Show,Generic)
-instance FromJSON ImportDocument
-instance ToJSON ImportDocument
-
-exportToImport :: ExportDocument -> ImportDocument
-exportToImport (ExportDocument rows) = ImportDocument $ fmap (delete "_rev" . doc) rows
-
-putStrLnMaybe :: Maybe B.ByteString -> IO ()
-putStrLnMaybe (Just a) = B.putStrLn a
-putStrLnMaybe Nothing = return ()
+writeContents :: String -> LB.ByteString -> IO ()
+writeContents "-" = LB.putStrLn
+writeContents loc
+  | isUrl loc = writeDatabase loc
+  | otherwise = LB.writeFile loc
 
 main :: IO ()
-main = let
-    content = B.getContents
-    json = decode <$> content
-    converted = fmap exportToImport <$> json
-    convertedJson = fmap encode <$> converted
-  in
-    convertedJson >>= putStrLnMaybe
+main = do
+  args <- arguments
+  contents <- fetchContents $ source args
+  converted <- convert contents
+  writeContents (destination args) converted
