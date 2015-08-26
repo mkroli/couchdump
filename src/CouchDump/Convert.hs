@@ -41,8 +41,12 @@ instance ToJSON ImportDocument
 exportToImport :: ExportDocument -> ImportDocument
 exportToImport (ExportDocument rows) = ImportDocument $ delete "_rev" <$> doc <$> rows
 
-decodeWithFailure :: (Monad m, FromJSON a) => ByteString -> m a
-decodeWithFailure = eitherErrorToMonad . eitherDecode
+decodeImportDocument :: Monad m => ByteString -> m ImportDocument
+decodeImportDocument content = case decode content :: Maybe ExportDocument of
+  Just r -> return $ exportToImport r
+  Nothing -> decodeWithFailure content
 
-convert :: (Monad m, Functor m) => ByteString -> m ByteString
-convert i = encode <$> exportToImport <$> decodeWithFailure i
+convert :: Monad m => ByteString -> m ByteString
+convert i = do
+  decoded <- decodeImportDocument i
+  return $ encode decoded

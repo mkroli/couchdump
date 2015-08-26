@@ -16,6 +16,12 @@ limitations under the License.
 
 module CouchDump.Misc where
 
+import           Data.Aeson
+import           Data.ByteString.Lazy
+
 eitherErrorToMonad :: Monad m => Either String a -> m a
 eitherErrorToMonad (Left e) = fail e
 eitherErrorToMonad (Right r) = return r
+
+decodeWithFailure :: (Monad m, FromJSON a) => ByteString -> m a
+decodeWithFailure = eitherErrorToMonad . eitherDecode
