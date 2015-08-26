@@ -12,7 +12,7 @@ executable couchdump
     main-is: Main.hs
     build-depends:
         aeson >=0.9.0.1,
-        base >=4.6 && <4.8,
+        base >=4.6,
         bytestring >=0.10.4.0,
         cmdargs >=0.10.13,
         http-conduit >=2.1.8,
