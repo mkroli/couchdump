@@ -2,6 +2,7 @@
 A tool to backup and restore a [CouchDB]-Database.
 
 ## Installation
+Download from [Releases](https://github.com/mkroli/couchdump/releases) or build:
 ```bash
 git clone https://github.com/mkroli/couchdump.git
 cd couchdump
