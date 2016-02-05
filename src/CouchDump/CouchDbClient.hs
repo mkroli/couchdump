@@ -41,5 +41,8 @@ writeDatabase :: String -> LB.ByteString -> IO ()
 writeDatabase url contents = do
   baseReq <- parseUrl url
   httpReq baseReq { method = methodPut, checkStatus = \_ _ _ -> Nothing }
-  httpReq baseReq { path = B.append (path baseReq) "/_bulk_docs", method = methodPost, requestHeaders = [("Content-Type", "application/json")], requestBody = RequestBodyLBS contents }
+  httpReq baseReq { path = B.append (path baseReq) "/_bulk_docs",
+                    method = methodPost,
+                    requestHeaders = ("Content-Type", "application/json") : requestHeaders baseReq,
+                    requestBody = RequestBodyLBS contents }
   return ()
