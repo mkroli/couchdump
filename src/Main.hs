@@ -21,6 +21,7 @@ import           CouchDump.CouchDbClient
 import qualified Data.ByteString.Lazy.Char8 as LB
 import           Data.Maybe
 import           Network.HTTP.Conduit
+import           System.Exit
 import           System.IO.Error
 
 isUrl :: String -> Bool
@@ -46,4 +47,4 @@ main = do
     writeContents (destination args) converted
   `catch` \e -> do
     putStrLn $ ioeGetErrorString (e :: IOException)
-    return ()
+    exitFailure
