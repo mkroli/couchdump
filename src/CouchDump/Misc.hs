@@ -1,5 +1,5 @@
 {-|
-Copyright 2015 Michael Krolikowski
+Copyright 2015-2016 Michael Krolikowski
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,3 +25,8 @@ eitherErrorToMonad (Right r) = return r
 
 decodeWithFailure :: (Monad m, FromJSON a) => ByteString -> m a
 decodeWithFailure = eitherErrorToMonad . eitherDecode
+
+joinList :: [[a]] -> [a] -> [a]
+joinList [] sep = []
+joinList [head] _ = head
+joinList (head:tail) sep = head ++ sep ++ joinList tail sep

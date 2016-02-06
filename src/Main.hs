@@ -14,12 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -}
 
+import           Control.Exception
 import           CouchDump.Args
 import           CouchDump.Convert
 import           CouchDump.CouchDbClient
 import qualified Data.ByteString.Lazy.Char8 as LB
 import           Data.Maybe
 import           Network.HTTP.Conduit
+import           System.IO.Error
 
 isUrl :: String -> Bool
 isUrl = isJust . parseUrl
@@ -38,7 +40,10 @@ writeContents loc
 
 main :: IO ()
 main = do
-  args <- arguments
-  contents <- fetchContents $ source args
-  converted <- convert contents
-  writeContents (destination args) converted
+    args <- arguments
+    contents <- fetchContents $ source args
+    converted <- convert contents
+    writeContents (destination args) converted
+  `catch` \e -> do
+    putStrLn $ ioeGetErrorString (e :: IOException)
+    return ()
