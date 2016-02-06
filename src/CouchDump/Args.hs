@@ -27,5 +27,5 @@ arguments :: IO Arguments
 arguments = cmdArgs_ $ record Arguments{} [
   source      := "-" += typ "location" += help "the source DB (URL, path or - for stdin, default is -)",
   destination := "-" += typ "location" += help "the destination DB (URL, path or - for stdout, default is -)"]
-    += summary "couchdump 0.1"
+    += summary "couchdump 0.2"
     += program "couchdump"

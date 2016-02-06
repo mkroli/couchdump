@@ -12,7 +12,7 @@ cabal install
 ## Usage
 ```
 $ couchdump --help
-couchdump 0.1
+couchdump 0.2
 
 couchdump [OPTIONS]
 
