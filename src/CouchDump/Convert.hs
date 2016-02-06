@@ -14,32 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -}
 
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE OverloadedStrings             #-}
 
 module CouchDump.Convert (convert) where
 
-import           Control.Applicative
+import           Control.Monad
 import           CouchDump.Misc
 import           Data.Aeson
 import           Data.ByteString.Lazy
 import           Data.HashMap.Strict
 import           GHC.Generics
 
-newtype Row = Row {doc :: Object} deriving (Show, Generic)
-instance FromJSON Row
-instance ToJSON Row
-
-newtype ExportDocument = ExportDocument {rows :: [Row]} deriving (Show, Generic)
-instance FromJSON ExportDocument
-instance ToJSON ExportDocument
-
-newtype ImportDocument = ImportDocument {docs :: [Object]} deriving (Show, Generic)
-instance FromJSON ImportDocument
-instance ToJSON ImportDocument
+newtype Row = Row {doc :: Object} deriving (Show, Generic, FromJSON, ToJSON)
+newtype ExportDocument = ExportDocument {rows :: [Row]} deriving (Show, Generic, FromJSON, ToJSON)
+newtype ImportDocument = ImportDocument {docs :: [Object]} deriving (Show, Generic, FromJSON, ToJSON)
 
 exportToImport :: ExportDocument -> ImportDocument
-exportToImport (ExportDocument rows) = ImportDocument $ delete "_rev" <$> doc <$> rows
+exportToImport (ExportDocument rows) = ImportDocument $ liftM (delete "_rev" . doc) rows
 
 decodeImportDocument :: Monad m => ByteString -> m ImportDocument
 decodeImportDocument content = case decode content :: Maybe ExportDocument of
@@ -47,6 +39,4 @@ decodeImportDocument content = case decode content :: Maybe ExportDocument of
   Nothing -> decodeWithFailure content
 
 convert :: Monad m => ByteString -> m ByteString
-convert i = do
-  decoded <- decodeImportDocument i
-  return $ encode decoded
+convert i = liftM encode $ decodeImportDocument i

@@ -25,7 +25,7 @@ data Arguments = Arguments {source :: String, destination :: String} deriving (S
 
 arguments :: IO Arguments
 arguments = cmdArgs_ $ record Arguments{} [
-  source      := "-" += help "the source DB (URL, path or - for stdin, default is -)" += typ "location",
-  destination := "-" += help "the destination DB (URL, path or - for stdout, default is -)" += typ "location"]
+  source      := "-" += typ "location" += help "the source DB (URL, path or - for stdin, default is -)",
+  destination := "-" += typ "location" += help "the destination DB (URL, path or - for stdout, default is -)"]
     += summary "couchdump 0.1"
     += program "couchdump"
