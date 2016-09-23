@@ -21,11 +21,12 @@ module CouchDump.Args where
 
 import           System.Console.CmdArgs.Implicit
 
-data Arguments = Arguments {source :: String, destination :: String} deriving (Show, Data, Typeable)
+data Arguments = Arguments {source :: String, destination :: String, drop :: Bool} deriving (Show, Data, Typeable)
 
 arguments :: IO Arguments
 arguments = cmdArgs_ $ record Arguments{} [
-  source      := "-" += typ "location" += help "the source DB (URL, path or - for stdin, default is -)",
-  destination := "-" += typ "location" += help "the destination DB (URL, path or - for stdout, default is -)"]
+  CouchDump.Args.source      := "-"   += typ "location" += help "the source DB (URL, path or - for stdin, default is -)",
+  CouchDump.Args.destination := "-"   += typ "location" += help "the destination DB (URL, path or - for stdout, default is -)",
+  CouchDump.Args.drop        := False                   += help "drop the destination DB upfront" += explicit += name "drop" ]
     += summary "couchdump 0.2"
     += program "couchdump"

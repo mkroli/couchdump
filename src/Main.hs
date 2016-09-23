@@ -33,6 +33,13 @@ fetchContents loc
   | isUrl loc = fetchDatabase loc
   | otherwise = LB.readFile loc
 
+initDatabase :: String -> Bool -> IO LB.ByteString
+initDatabase loc True  = do
+  dropDatabase loc
+  createDatabase loc
+initDatabase loc False =
+  createDatabase loc
+
 writeContents :: String -> LB.ByteString -> IO ()
 writeContents "-" = LB.putStrLn
 writeContents loc
@@ -44,6 +51,7 @@ main = do
     args <- arguments
     contents <- fetchContents $ source args
     converted <- convert contents
+    initDatabase (destination args) (CouchDump.Args.drop args)
     writeContents (destination args) converted
   `catch` \e -> do
     putStrLn $ ioeGetErrorString (e :: IOException)
